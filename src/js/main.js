@@ -1,18 +1,15 @@
 // https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=что_искать&page=номер_страницы&per_page=12&key=твой_ключ
 import imageListTemplate from "../templates/images-list.hbs" ;
 import imagesService from "./images-service.js" ;
+import getRefs from "./get-refs.js" ;
+
+const refs = getRefs();
 
 
 
 
-
-const galleryListEL= document.querySelector('.gallery') ;
-const inputEl= document.querySelector('#search-form') ;
-const loadMoreBtn= document.querySelector('.load-more-button') ;
-
-
-
-inputEl.addEventListener('submit', searchImages);
+refs.inputEl.addEventListener('submit', searchImages);
+refs.loadMoreBtn.addEventListener('click', fetchHits) ;
 
 function searchImages(e){
     e.preventDefault();
@@ -21,23 +18,35 @@ function searchImages(e){
     imagesService.query = form.elements.query.value;
     
    imagesService.resetPage();
-    galleryListEL.innerHTML = '' ;
-    form.reset() ;
 
-    imagesService.fetchApi().then(hits => {
-        renderImageCard(hits);
-      
-        
-    });
+   refs.galleryListEL.innerHTML = '' ;
+
+   fetchHits();
+
+    form.reset() ;
 }
 
-loadMoreBtn.addEventListener('click', loadMoreImages) ;
-function loadMoreImages(){
+
+
+function fetchHits(){
+    refs.loadMoreBtn.classList.add('is-hidden');
+    refs.spinnerEl.classList.remove('is-hidden');
+
     imagesService.fetchApi().then(hits => {
         renderImageCard(hits);
-       
-        
-    });
+        refs.loadMoreBtn.classList.remove('is-hidden');
+
+       setTimeout(() => {
+        window.scrollTo({
+            top: document.documentElement.offsetHeight,
+            behavior: 'smooth'
+        })
+           
+       }, 1000);
+
+        }).catch(error=>console.log('sorry, ERROR')).finally(() =>{
+            refs.spinnerEl.classList.add('is-hidden')
+        });
 
 }
 
@@ -50,5 +59,5 @@ function loadMoreImages(){
 function renderImageCard(hits){
     const markup = imageListTemplate(hits);
 
-    galleryListEL.insertAdjacentHTML('beforeend', markup)
+    refs.galleryListEL.insertAdjacentHTML('beforeend', markup)
 }
