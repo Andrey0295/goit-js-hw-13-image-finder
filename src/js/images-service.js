@@ -7,7 +7,7 @@ export default {
     
         const url = 'https://pixabay.com/api/?image_type=photo&orientation=horizontal' ;
       
-        return fetch(`${url}&q=${this.searchQuery}&page=${this.page}&per_page=12&key=${apiKey}`)
+        return fetch(`${url}&q=${this.searchQuery}&page=${this.page}&per_page=6&key=${apiKey}`)
         .then(response=>response.json())
         .then(({hits}) => {
             this.page += 1 ;
